@@ -1,0 +1,208 @@
+<div id="app"></div>
+
+<style>
+  #app * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  #app { max-width: 440px; margin: 0 auto; font-family: var(--font-sans, system-ui, sans-serif); color: var(--text-primary, #1a1a1a); }
+  .row { display:flex; align-items:center; gap:12px; padding:13px 12px; background:var(--surface-2,#fff); border:0.5px solid var(--border,#e3e3df); border-radius:10px; margin-bottom:7px; cursor:pointer; user-select:none; transition:background .12s; min-height:50px; }
+  .row:active { background:var(--surface-1,#f3f1ea); }
+  .box { width:24px; height:24px; border-radius:6px; border:2px solid var(--border-strong,#c4c2b8); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .box.on { background:var(--text-accent,#185fa5); border-color:var(--text-accent,#185fa5); }
+  .box.on i { color:#fff; font-size:16px; }
+  .box i { display:none; }
+  .box.on i { display:block; }
+  .txt { font-size:14px; line-height:1.35; }
+  .row.done .txt { color:var(--text-muted,#8a897f); text-decoration:line-through; }
+  .acc { color:#993c1d; font-weight:500; }
+  .accb { color:var(--text-accent,#185fa5); font-weight:500; }
+  .spf { background:var(--bg-warning,#faeeda); border-color:var(--border-warning,#ba7517); }
+  .spf .txt { color:#854f0b; font-weight:500; }
+  .dev { background:var(--surface-0,#f8f7f2); border-style:dashed; cursor:default; }
+  .dev:active { background:var(--surface-0,#f8f7f2); }
+  .nav { display:flex; align-items:center; justify-content:space-between; background:var(--surface-2,#fff); border:0.5px solid var(--border,#e3e3df); border-radius:12px; padding:6px; margin-bottom:10px; }
+  .navbtn { width:46px; height:46px; display:flex; align-items:center; justify-content:center; border-radius:10px; cursor:pointer; }
+  .navbtn:active { background:var(--surface-1,#f3f1ea); }
+  .navbtn i { font-size:22px; color:var(--text-secondary,#5f5e5a); }
+  .pill { font-size:13px; font-weight:500; padding:7px 13px; border-radius:20px; cursor:pointer; }
+  .pill.on { background:var(--bg-accent,#e6f1fb); color:var(--text-accent,#185fa5); }
+  .pill.off { color:var(--text-muted,#8a897f); border:0.5px solid var(--border,#e3e3df); }
+  .sec { font-size:13px; font-weight:500; color:var(--text-secondary,#5f5e5a); margin:16px 0 9px; display:flex; align-items:center; gap:6px; }
+  .daypills { display:flex; gap:4px; margin-bottom:14px; }
+  .dp { flex:1; text-align:center; font-size:12px; padding:7px 0; border-radius:7px; cursor:pointer; color:var(--text-muted,#8a897f); }
+  .dp.on { background:var(--bg-accent,#e6f1fb); color:var(--text-accent,#185fa5); font-weight:500; }
+  .barwrap { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
+  .bar { flex:1; height:8px; background:var(--surface-0,#eee); border-radius:10px; overflow:hidden; }
+  .barfill { height:100%; background:var(--text-accent,#185fa5); border-radius:10px; transition:width .25s; }
+  .resetbtn { font-size:12px; color:var(--text-muted,#8a897f); background:none; border:0.5px solid var(--border,#e3e3df); border-radius:8px; padding:8px 12px; cursor:pointer; }
+  .resetbtn:active { background:var(--surface-1,#f3f1ea); }
+</style>
+
+<script>
+(function(){
+  const A = (x,s,k)=>({x,s:s||"",k:k||""});
+  function am(bright){
+    return [
+      A("Temizlik · COSRX Salicylic"),
+      A("Tonik · Skin1004 Centella"),
+      A("Aydınlatıcı · "+bright,"","b"),
+      A("Göz · Tonymoly Snail"),
+      A("Nemlendirici · Anua Heartleaf"),
+      A("Güneş kremi · Bioré SPF50 (şart)","","spf"),
+    ];
+  }
+  function retPM(ret){ return [
+      A("Temizlik · COSRX"),
+      A("Retinoid · "+ret,"","r"),
+      A("Nemlendirici · Anua + Ceramide"),
+      A("Göz · Anua Retinol eye"),
+      A("Cihaz: bu gece YOK (retinoid gecesi)","","dev"),
+    ];}
+  function exfoPM(ac){ return [
+      A("Temizlik · COSRX"),
+      A("Asit · "+ac,"pamukla","r"),
+      A("Yatıştırma · Anua PDRN+HA"),
+      A("Nemlendirici · Anua Heartleaf"),
+      A("Göz · Shiseido Benefiance"),
+      A("Cihaz: bu gece YOK (asit gecesi)","","dev"),
+    ];}
+  function pdrnPM(serum,mois){ return [
+      A("Temizlik"),
+      A("Tonik · Skin1004 Centella"),
+      A("PDRN · "+serum,"","b"),
+      A("Cihaz: Booster Mode · PDRN ile, 5 dk","","dev"),
+      A("Nemlendirici · "+mois),
+      A("Cihaz: MC + Derma Shot · krem ile","","dev"),
+      A("Göz · Shiseido Benefiance"),
+    ];}
+  function poreP(serum,mois){ return [
+      A("Temizlik → yüz KURU"),
+      A("Cihaz: Air Shot · kuru yüz, gözenek 5 dk","","dev"),
+      A("Tonik · Anua PDRN+HA"),
+      A("Cihaz: Booster Mode · PDRN ile","","dev"),
+      A("PDRN · "+serum,"","b"),
+      A("Nemlendirici · "+mois),
+      A("Cihaz: Derma Shot · çene-elmacık","","dev"),
+      A("Göz · Tonymoly Snail"),
+    ];}
+  const peelPM = [
+      A("Temizlik · COSRX"),
+      A("Güçlü peeling · TO AHA30+BHA2 (MAX 10 dk, durula)","","r"),
+      A("Tonik · Skin1004 Centella"),
+      A("Yoğun yatıştırma · Anua + Ceramide"),
+      A("Nemlendirici · Dr.Althea 345"),
+      A("Cihaz: bu gece YOK","","dev"),
+  ];
+  const maskPM = [
+      A("Temizlik · COSRX"),
+      A("Maske · Keana Rice Pack (durula)"),
+      A("Hidrasyon · Anua PDRN+HA"),
+      A("Nemlendirici · Anua Heartleaf"),
+      A("Cihaz: opsiyonel · Booster Mode","","dev"),
+  ];
+  function restPM(){ return [
+      A("Temizlik"),
+      A("Tonik · Skin1004 Centella"),
+      A("Bakuchiol · Eqqual Berry"),
+      A("Gece serumu · Shiseido Vital Perfection"),
+      A("Nemlendirici · Anua Heartleaf"),
+      A("Göz · Shiseido Benefiance"),
+      A("Cihaz: opsiyonel · hafif Booster/MC","","dev"),
+  ];}
+
+  const DAYS = ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"];
+  const SHORT = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+
+  const data = {
+    1: [
+      {th:"Retinoid gecesi · Retinal", am:am("Melano CC (C vit)"), pm:retPM("Celimax Retinal")},
+      {th:"Onarım + cihaz gecesi",     am:am("Ultimune + AXIS-Y"), pm:pdrnPM("Rejuran Ampoule","Dr.Althea 345")},
+      {th:"Eksfoliasyon gecesi",       am:am("Alpha Arbutin"),     pm:exfoPM("TO Glycolic 7%")},
+      {th:"Retinoid gecesi · Retinol", am:am("Melano CC (C vit)"), pm:retPM("Celimax Retinol")},
+      {th:"Gözenek + cihaz gecesi",    am:am("Botocare Dark Spot"),pm:poreP("Frankly PDRN","Dr.Althea 345")},
+      {th:"Güçlü peeling gecesi",      am:am("COSRX Niacinamide 15"),pm:peelPM},
+      {th:"Dinlenme · hidrasyon",      am:am("Shiseido White Lucent"),pm:restPM()},
+    ],
+    2: [
+      {th:"Retinoid gecesi · Retinol", am:am("Alpha Arbutin"),     pm:retPM("Celimax Retinol")},
+      {th:"Onarım + cihaz gecesi",     am:am("Shiseido White Lucent"),pm:pdrnPM("Anua PDRN+HA","Anua Heartleaf")},
+      {th:"Eksfoliasyon gecesi",       am:am("AXIS-Y Dark Spot"),  pm:exfoPM("SomeByMi AHA·BHA·PHA")},
+      {th:"Retinoid gecesi · Retinal", am:am("Melano CC (C vit)"), pm:retPM("Celimax Retinal")},
+      {th:"Gözenek + cihaz gecesi",    am:am("Botocare Dark Spot"),pm:poreP("Rejuran Dual Effect","Dr.Althea 345")},
+      {th:"Maske gecesi",             am:am("COSRX Niacinamide 15"),pm:maskPM},
+      {th:"Dinlenme · hidrasyon",      am:am("Shiseido Ultimune"), pm:restPM()},
+    ]
+  };
+
+  const KEY = "serhan-cilt-takip-v1";
+  let checked = {};
+  let week = 1, day = (new Date().getDay()+6)%7;
+
+  async function load(){
+    try { const r = await window.storage.get(KEY, false); if(r&&r.value) checked = JSON.parse(r.value); } catch(e){ checked = {}; }
+    render();
+  }
+  async function save(){ try { await window.storage.set(KEY, JSON.stringify(checked), false); } catch(e){} }
+
+  function ck(part,i){ return !!(checked["w"+week+"d"+day+part] && checked["w"+week+"d"+day+part][i]); }
+  function toggle(part,i){
+    const k="w"+week+"d"+day+part;
+    if(!checked[k]) checked[k]=[];
+    checked[k][i]=!checked[k][i];
+    save(); render();
+  }
+
+  function rowHTML(part,i,step){
+    if(step.k==="dev"){ return '<div class="row dev"><i class="ti ti-device-watch" style="font-size:20px;color:var(--text-muted,#8a897f)"></i><span class="txt" style="color:var(--text-muted,#8a897f);font-size:13px">'+step.x+'</span></div>'; }
+    const on=ck(part,i);
+    let label=step.x;
+    if(step.k==="r") label=label.replace(/· (.+)/,'· <span class="acc">$1</span>');
+    if(step.k==="b") label=label.replace(/· (.+)/,'· <span class="accb">$1</span>');
+    const sub=step.s?'<span style="color:var(--text-muted,#8a897f);font-size:12px"> ('+step.s+')</span>':'';
+    return '<div class="row '+(step.k==="spf"?"spf ":"")+(on?"done":"")+'" data-p="'+part+'" data-i="'+i+'">'
+      +'<span class="box '+(on?"on":"")+'"><i class="ti ti-check"></i></span>'
+      +'<span class="txt">'+label+sub+'</span></div>';
+  }
+
+  function render(){
+    const d=data[week][day];
+    const all=d.am.concat(d.pm).filter(s=>s.k!=="dev");
+    let done=0; d.am.forEach((s,i)=>{if(s.k!=="dev"&&ck("am",i))done++;}); d.pm.forEach((s,i)=>{if(s.k!=="dev"&&ck("pm",i))done++;});
+    const tot=all.length, pct=tot?Math.round(done/tot*100):0;
+
+    let h='';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      +'<div><div style="font-size:17px;font-weight:500">Cilt bakım takibim</div>'
+      +'<div style="font-size:12px;color:var(--text-muted,#8a897f)">Serhan · 2 haftalık program</div></div>'
+      +'<div style="display:flex;gap:5px">'
+      +'<span class="pill '+(week===1?"on":"off")+'" data-w="1">Hafta 1</span>'
+      +'<span class="pill '+(week===2?"on":"off")+'" data-w="2">Hafta 2</span></div></div>';
+
+    h+='<div class="nav"><div class="navbtn" data-nav="-1"><i class="ti ti-chevron-left"></i></div>'
+      +'<div style="text-align:center"><div style="font-size:15px;font-weight:500">'+DAYS[day]+'</div>'
+      +'<div style="font-size:11px;color:var(--text-muted,#8a897f)">'+d.th+'</div></div>'
+      +'<div class="navbtn" data-nav="1"><i class="ti ti-chevron-right"></i></div></div>';
+
+    h+='<div class="daypills">'+SHORT.map((s,i)=>'<div class="dp '+(i===day?"on":"")+'" data-d="'+i+'">'+s+'</div>').join('')+'</div>';
+
+    h+='<div class="barwrap"><div class="bar"><div class="barfill" style="width:'+pct+'%"></div></div>'
+      +'<span style="font-size:13px;font-weight:500;color:var(--text-secondary,#5f5e5a);min-width:34px;text-align:right">'+done+'/'+tot+'</span></div>';
+    h+='<div style="text-align:right;margin-bottom:6px"><button class="resetbtn" data-reset="1">Bu günü sıfırla</button></div>';
+
+    h+='<div class="sec"><i class="ti ti-sun" style="font-size:16px"></i> Sabah</div>';
+    h+=d.am.map((s,i)=>rowHTML("am",i,s)).join('');
+    h+='<div class="sec"><i class="ti ti-moon" style="font-size:16px"></i> Gece</div>';
+    h+=d.pm.map((s,i)=>rowHTML("pm",i,s)).join('');
+    h+='<div style="height:8px"></div>';
+
+    const app=document.getElementById('app');
+    app.innerHTML=h;
+
+    app.querySelectorAll('.row[data-p]').forEach(el=>el.addEventListener('click',()=>toggle(el.dataset.p,+el.dataset.i)));
+    app.querySelectorAll('.pill[data-w]').forEach(el=>el.addEventListener('click',()=>{week=+el.dataset.w;render();}));
+    app.querySelectorAll('.dp[data-d]').forEach(el=>el.addEventListener('click',()=>{day=+el.dataset.d;render();}));
+    app.querySelectorAll('[data-nav]').forEach(el=>el.addEventListener('click',()=>{day=(day+ +el.dataset.nav+7)%7;render();}));
+    const rb=app.querySelector('[data-reset]'); if(rb) rb.addEventListener('click',()=>{ checked["w"+week+"d"+day+"am"]=[]; checked["w"+week+"d"+day+"pm"]=[]; save(); render(); });
+  }
+
+  load();
+})();
+</script>
